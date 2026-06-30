@@ -45,11 +45,10 @@ Output structure for analytical answers:
 4. \`[panel:<id>|Open <name>]\` link(s) for deeper data.`;
 
 const ALLOWED_MODELS = new Set([
-  'google/gemini-3-flash-preview',
-  'google/gemini-2.5-flash',
-  'google/gemini-2.5-pro',
-  'openai/gpt-5-mini',
-  'openai/gpt-5',
+  'openai/gpt-4-mini',
+  'openai/gpt-4o-mini',
+  'openai/gpt-4',
+  'openai/gpt-4-turbo',
 ]);
 
 interface ChatMessage { role: 'user' | 'assistant' | 'system'; content: string }

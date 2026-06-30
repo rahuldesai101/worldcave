@@ -313,11 +313,22 @@ export class LatestBriefPanel extends Panel {
     if (!res.ok) {
       throw new Error(`Brief service unavailable (${res.status})`);
     }
-    const body = (await res.json()) as LatestBriefResponse;
-    if (!body || (body.status !== 'ready' && body.status !== 'composing')) {
+    let body: unknown;
+    try {
+      body = await res.json();
+    } catch (err) {
+      console.error('[LatestBriefPanel] JSON parse error:', (err as Error).message);
+      throw new Error('Brief service returned invalid response');
+    }
+    if (!body || typeof body !== 'object' || !('status' in body)) {
+      console.error('[LatestBriefPanel] Invalid brief response shape:', body);
       throw new Error('Unexpected response from brief service');
     }
-    return body;
+    const typedBody = body as LatestBriefResponse;
+    if (typedBody.status !== 'ready' && typedBody.status !== 'composing') {
+      throw new Error('Unexpected response from brief service');
+    }
+    return typedBody;
   }
 
   private renderLoading(): void {

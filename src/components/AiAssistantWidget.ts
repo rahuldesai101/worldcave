@@ -1,6 +1,6 @@
 // Header-mounted AI assistant trigger (W.A.V.E.) with a theme-matched
 // slide-in right sidebar. Sign-in gated (Clerk). Streams answers from the
-// `ai-assistant` Supabase edge function (Lovable AI Gateway).
+// `ai-assistant` Supabase edge function (Vercel AI Gateway).
 
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -29,21 +29,21 @@ const LEGACY_HISTORY_KEY = 'wc-ai-history-v1';
 
 interface ModelOption { id: string; label: string }
 const MODELS: ModelOption[] = [
-  { id: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash · fast' },
-  { id: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
-  { id: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro · deep' },
-  { id: 'openai/gpt-5-mini', label: 'GPT-5 mini' },
-  { id: 'openai/gpt-5', label: 'GPT-5 · premium' },
+  { id: 'openai/gpt-4-mini', label: 'GPT-4 mini · fast' },
+  { id: 'openai/gpt-4o-mini', label: 'GPT-4o mini · balanced' },
+  { id: 'openai/gpt-4', label: 'GPT-4 · advanced' },
+  { id: 'openai/gpt-4-turbo', label: 'GPT-4 Turbo · deep analysis' },
 ];
-const DEFAULT_MODEL = 'google/gemini-3-flash-preview';
+const DEFAULT_MODEL = 'openai/gpt-4-mini';
 
 function modelLabel(id: string): string {
   return MODELS.find(m => m.id === id)?.label ?? MODELS.find(m => m.id === DEFAULT_MODEL)?.label ?? 'Gemini 3 Flash';
 }
 
 function modelHint(id: string): string {
-  if (id.includes('pro') || id.includes('gpt-5')) return 'Advanced reasoning and harder research';
-  if (id.includes('mini') || id.includes('2.5-flash')) return 'Balanced speed and analysis';
+  if (id.includes('turbo') || id.includes('gpt-4-turbo')) return 'Advanced reasoning and complex research tasks';
+  if (id.includes('gpt-4') && !id.includes('mini') && !id.includes('turbo')) return 'Balance of speed and advanced analysis';
+  if (id.includes('4o') || id.includes('mini')) return 'Fast, cost-effective for most queries';
   return 'Fast answers for live dashboard work';
 }
 
