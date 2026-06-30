@@ -11,7 +11,7 @@ import type {
 } from '../../../../src/generated/server/worldmonitor/market/v1/service_server';
 import { parseStringArray } from './_shared';
 import { getCachedJson, cachedFetchJson } from '../../../_shared/redis';
-import stocksConfig from '../../../../shared/stocks.json' assert { type: 'json' };
+import stocksConfig from '../../../../shared/stocks.json' with { type: 'json' };
 
 const BOOTSTRAP_KEY = 'market:stocks-bootstrap:v1';
 const LIVE_FALLBACK_KEY = 'market:stocks-finnhub-live:v1';

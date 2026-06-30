@@ -1,5 +1,5 @@
-// AI assistant streaming endpoint. Proxies to Lovable AI Gateway and streams
-// the raw OpenAI-compatible SSE back to the browser. Frontend gates sign-in;
+// AI assistant streaming endpoint. Proxies to Vercel AI Gateway (Cloudflare)
+// and streams the raw OpenAI-compatible SSE back to the browser. Frontend gates sign-in;
 // this function is open but rate-limited by the gateway.
 
 const corsHeaders = {
@@ -45,11 +45,10 @@ Output structure for analytical answers:
 4. \`[panel:<id>|Open <name>]\` link(s) for deeper data.`;
 
 const ALLOWED_MODELS = new Set([
-  'google/gemini-3-flash-preview',
-  'google/gemini-2.5-flash',
-  'google/gemini-2.5-pro',
-  'openai/gpt-5-mini',
-  'openai/gpt-5',
+  'openai/gpt-4-mini',
+  'openai/gpt-4o-mini',
+  'openai/gpt-4',
+  'openai/gpt-4-turbo',
 ]);
 
 interface ChatMessage { role: 'user' | 'assistant' | 'system'; content: string }
@@ -151,7 +150,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  const apiKey = Deno.env.get('LOVABLE_API_KEY');
+  const apiKey = Deno.env.get('AI_GATEWAY_API_KEY');
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'service_unavailable' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -186,19 +185,19 @@ Deno.serve(async (req) => {
   // caller pinned something other than the default fast model.
   let chosenModel = payload.model && ALLOWED_MODELS.has(payload.model)
     ? payload.model
-    : 'google/gemini-3-flash-preview';
-  if (mode === 'deep' && (!payload.model || payload.model === 'google/gemini-3-flash-preview')) {
-    chosenModel = 'google/gemini-2.5-pro';
+    : 'openai/gpt-4-mini';
+  if (mode === 'deep' && (!payload.model || payload.model === 'openai/gpt-4-mini')) {
+    chosenModel = 'openai/gpt-4';
   }
   const model = chosenModel;
   const systemPrompt = appendMode(buildSystemPrompt(payload.context), mode);
 
-  const upstream = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+  const upstream = await fetch('https://api.gateway.ai.cloudflare.com/v1/openai/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Lovable-API-Key': apiKey,
-      'X-Lovable-AIG-SDK': 'worldcave-edge-fn',
+      'Authorization': `Bearer ${apiKey}`,
+      'User-Agent': 'worldcave-ai-assistant/1.0',
     },
     body: JSON.stringify({
       model,
