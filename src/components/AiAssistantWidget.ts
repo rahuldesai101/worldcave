@@ -1,11 +1,12 @@
 // Header-mounted AI assistant trigger (W.A.V.E.) with a theme-matched
 // slide-in right sidebar. Sign-in gated (Clerk). Streams answers from the
-// `/api/ai-assistant` Vercel route (Vercel AI Gateway).
+// `ai-assistant` Supabase edge function (Vercel AI Gateway).
 
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { getCurrentClerkUser, subscribeClerk, openSignIn } from '@/services/clerk';
 import { fetchRemoteThreads, upsertRemoteThread, deleteRemoteThread } from '@/services/ai-chat-storage';
+import { createClient } from '@supabase/supabase-js';
 
 interface ChatMessage { role: 'user' | 'assistant'; content: string }
 interface ChatThread {
@@ -19,7 +20,11 @@ interface ChatThread {
 }
 type AssistantMode = 'latest' | 'summary' | 'deep';
 
-const ENDPOINT = '/api/ai-assistant';
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+);
+const ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 const THREADS_KEY = 'wc-ai-threads-v2';
 const ACTIVE_THREAD_KEY = 'wc-ai-active-thread-v2';
 const MODEL_KEY = 'wc-ai-model-v1';
