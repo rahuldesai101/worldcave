@@ -6,7 +6,6 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { getCurrentClerkUser, subscribeClerk, openSignIn } from '@/services/clerk';
 import { fetchRemoteThreads, upsertRemoteThread, deleteRemoteThread } from '@/services/ai-chat-storage';
-import { createClient } from '@supabase/supabase-js';
 
 interface ChatMessage { role: 'user' | 'assistant'; content: string }
 interface ChatThread {
@@ -20,10 +19,6 @@ interface ChatThread {
 }
 type AssistantMode = 'latest' | 'summary' | 'deep';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
-);
 const ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 const THREADS_KEY = 'wc-ai-threads-v2';
 const ACTIVE_THREAD_KEY = 'wc-ai-active-thread-v2';
@@ -1426,7 +1421,6 @@ export class AiAssistantWidget {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(ANON_KEY ? { 'apikey': ANON_KEY, 'Authorization': `Bearer ${ANON_KEY}` } : {}),
         },
         body: JSON.stringify({
           messages: t.messages.slice(0, -1).map(m => ({ role: m.role, content: m.content })),
