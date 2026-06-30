@@ -1,6 +1,6 @@
 // Header-mounted AI assistant trigger (W.A.V.E.) with a theme-matched
 // slide-in right sidebar. Sign-in gated (Clerk). Streams answers from the
-// `ai-assistant` Supabase edge function (Vercel AI Gateway).
+// `/api/ai-assistant` Vercel route (Vercel AI Gateway).
 
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -19,8 +19,7 @@ interface ChatThread {
 }
 type AssistantMode = 'latest' | 'summary' | 'deep';
 
-const ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
-const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const ENDPOINT = '/api/ai-assistant';
 const THREADS_KEY = 'wc-ai-threads-v2';
 const ACTIVE_THREAD_KEY = 'wc-ai-active-thread-v2';
 const MODEL_KEY = 'wc-ai-model-v1';
